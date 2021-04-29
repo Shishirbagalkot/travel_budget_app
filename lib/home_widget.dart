@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,14 +9,28 @@ class Home extends StatefulWidget {
     }
     
 class _HomeState extends State<Home> {
+  
+  int _currentIndex = 0;
+  final List<Widget> _children = [ //list of widgets from page.dart file are imported and displayed
+    HomePage(),
+    ExplorePage(),
+    HistoryPage(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Travel Budget App"),
       ),
+
+      body: _children[_currentIndex],
+
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, //tells app which tab is pressed
+
+        onTap: onTabTapped,
+
+        currentIndex: _currentIndex, //tells app which tab is pressed
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.home),
@@ -32,6 +47,12 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 }
 
