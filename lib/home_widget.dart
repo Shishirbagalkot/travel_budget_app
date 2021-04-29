@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_treasury/home_view.dart';
 import 'pages.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +13,7 @@ class _HomeState extends State<Home> {
   
   int _currentIndex = 0;
   final List<Widget> _children = [ //list of widgets from page.dart file are imported and displayed
-    HomePage(),
+    HomeView(),
     ExplorePage(),
     HistoryPage(),
   ];
