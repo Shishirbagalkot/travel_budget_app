@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:travel_treasury/trip.dart';
+import 'package:travel_treasury/models/trip.dart';
 import 'package:intl/intl.dart'; //used to format date to be displayed 
 
 class HomeView extends StatelessWidget {

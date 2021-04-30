@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:travel_treasury/home_view.dart';
+import 'package:travel_treasury/views/home_view.dart';
 import 'pages.dart';
 
 class Home extends StatefulWidget {
