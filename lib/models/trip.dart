@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 //model the data
 class Trip {
   final String title;
