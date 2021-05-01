@@ -1,4 +1,4 @@
-//model the data
+//models the data
 class Trip {
   final String title;
   final DateTime startDate;

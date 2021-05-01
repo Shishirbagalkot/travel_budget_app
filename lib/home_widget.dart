@@ -12,6 +12,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   
   int _currentIndex = 0;
+  //for the bottom navigation bar
   final List<Widget> _children = [ //list of widgets from page.dart file are imported and displayed
     HomeView(),
     ExplorePage(),
