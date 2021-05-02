@@ -29,13 +29,9 @@ class NewTripBudgetView extends StatelessWidget {
               child: Text("Finish"),
               onPressed: () async{ 
                 //save data to firebase, async to prevent lock-up of frontend
-                await db.collection("trips").add(
-                  {
-                    'title': trip.title,
-                    'startDate': trip.startDate,
-                    'endDate': trip.endDate,
-                  }
-                );
+                //trip.toJson is added from Map from trip.dart
+                await db.collection("trips").add(trip.toJson());
+
                 //removes all pages from stack and goes to first page
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }, 
