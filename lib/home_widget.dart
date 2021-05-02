@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:travel_treasury/models/trip.dart';
 import 'package:travel_treasury/views/home_view.dart';
+import 'package:travel_treasury/views/new_trips/location_view.dart';
 import 'pages.dart';
 
 class Home extends StatefulWidget {
@@ -21,13 +23,24 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+
+    final newTrip = new Trip(null, null, null, null, null);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Travel Budget App"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add), 
-            onPressed: null
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  //this will be passed onto the location_view page
+                  builder: (context) => NewTripLocationView(trip: newTrip)
+                )
+              );
+            }
           ),
         ],
       ),
