@@ -24,6 +24,12 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Travel Budget App"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add), 
+            onPressed: null
+          ),
+        ],
       ),
 
       body: _children[_currentIndex],
