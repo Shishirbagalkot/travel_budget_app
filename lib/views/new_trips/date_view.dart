@@ -19,6 +19,7 @@ class NewTripDateView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text("Location ${trip.title}"),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -28,6 +29,8 @@ class NewTripDateView extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
+                trip.startDate = DateTime.now();
+                trip.endDate = DateTime.now();
                 Navigator.push(
                   context, 
                   MaterialPageRoute(
