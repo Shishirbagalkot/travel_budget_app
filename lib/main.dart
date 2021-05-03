@@ -12,15 +12,20 @@ void main() async{
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Travel Budget App",
       theme: ThemeData(
-        primarySwatch: Colors.green
+        primarySwatch: Colors.green,
       ),
       home: FirstView(),
+      routes: <String, WidgetBuilder>{
+        '/signUp' : (BuildContext context) => Home(),
+        '/home' : (BuildContext context) => Home(),
+      },
     );
   }
 }
