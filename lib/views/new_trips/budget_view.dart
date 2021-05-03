@@ -20,8 +20,7 @@ class NewTripBudgetView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("Finish"),
-            Text("Location ${trip.title}"),
+            Text("Location: ${trip.title}"),
             Text("Location ${trip.startDate}"),
             Text("Location ${trip.endDate}"),
 
