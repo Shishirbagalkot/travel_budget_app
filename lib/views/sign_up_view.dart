@@ -26,7 +26,7 @@ class _SignUpViewState extends State<SignUpView> {
   _SignUpViewState({this.authFormType});
 
   final formKey = GlobalKey<FormState>();
-  String _email, _password, _name;
+  String _email, _password, _name, _verifypassword, _error;
 
   //to return to sign in page from sign up page
   void switchFormState(String state) {
@@ -42,27 +42,39 @@ class _SignUpViewState extends State<SignUpView> {
     }
   }
 
+  //if form is validated, the form is submitted
+  bool validate() {
+    //if form is not saved then the db cannot be updated
+    final form = formKey.currentState;
+    if(form.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   //function for build buttons
   //to main state change consistently throughout the app
   void submit() async{
-
-    //if form is not saved then the db cannot be updated
-    final form = formKey.currentState;
-    form.save();
-
-    try {
-      final auth = Provider.of(context).auth;
-      if(authFormType == AuthFormType.signIn) {
-        String uid = await auth.signInWithEmailAndPassword(_email, _password);
-        print("Signed in with $uid");
-        Navigator.of(context).pushReplacementNamed("/home");
-      } else {
-        String uid = await auth.createUserWithEmailAndPassword(_email, _password, _name);
-        print("Signed up with new ID $uid");
-        Navigator.of(context).pushReplacementNamed("/home");
-      }
-    } catch (e) {
+    if(validate()) {  
+      try {
+        final auth = Provider.of(context).auth;
+        if(authFormType == AuthFormType.signIn) {
+          String uid = await auth.signInWithEmailAndPassword(_email, _password);
+          print("Signed in with $uid");
+          Navigator.of(context).pushReplacementNamed("/home");
+        } else {
+          String uid = await auth.createUserWithEmailAndPassword(_email, _password, _name);
+          print("Signed up with new ID $uid");
+          Navigator.of(context).pushReplacementNamed("/home");
+        }
+      } catch (e) {
           print(e);
+          setState(() {
+            _error = e.message; //the error message sent from firebase
+          });
+      }
     }
   }
 
@@ -81,7 +93,9 @@ class _SignUpViewState extends State<SignUpView> {
         child: SafeArea(
           child: Column(
             children: <Widget>[
-              SizedBox(height: _height * 0.05),
+              SizedBox(height: _height * 0.025),
+              showAlert(),
+              SizedBox(height: _height * 0.025),
               buildHeaderText(),
               SizedBox(height: _height * 0.05),
               Padding(
@@ -100,6 +114,37 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
+  Widget showAlert () {
+    if(_error != null) {
+      return Container(
+        color: Colors.amberAccent,
+        width: double.infinity,
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.error_outline),
+            ),
+            Expanded(child: AutoSizeText(_error, maxLines: 3)),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.close), 
+                onPressed: () {
+                  setState(() {
+                    _error = null;
+                  });
+                }
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox(height: 0);
+  }
+
   AutoSizeText buildHeaderText() {
     String _headerText;
     if (authFormType == AuthFormType.signUp) {
@@ -112,7 +157,7 @@ class _SignUpViewState extends State<SignUpView> {
       maxLines: 1,
       textAlign: TextAlign.center,
       style: TextStyle(
-        fontSize: 35,
+        fontSize: 30,
         color: Colors.white,
       ),
     );
@@ -124,34 +169,67 @@ class _SignUpViewState extends State<SignUpView> {
     //if in signup state add name
     if (authFormType == AuthFormType.signUp) {
       textFields.add(
-      TextFormField(
-        style: TextStyle(fontSize: 20.0),
-        decoration: buildSignUpInputDecoration("Name"),
-        onSaved: (value) => _name = value,
-      )
-    );
-    textFields.add(SizedBox(height: 20));
-  }
+        TextFormField(
+          validator: NameValidator.validate, //defined in auth_service
+          style: TextStyle(fontSize: 20.0),
+          decoration: buildSignUpInputDecoration("Name"),
+          onSaved: (value) => _name = value,
+        )
+      );
+      textFields.add(SizedBox(height: 10));
+    }
 
     //add email and password
     textFields.add(
       TextFormField(
+        validator: EmailValidator.validate, //defined in auth_service
         style: TextStyle(fontSize: 20.0),
         decoration: buildSignUpInputDecoration("Email"),
         onSaved: (value) => _email = value,
       )
     );
-    textFields.add(SizedBox(height: 20));
+    textFields.add(SizedBox(height: 10));
     textFields.add(
       TextFormField(
+        validator: (String value) {
+          _verifypassword = value;
+          if(value.isEmpty) {
+            return "Password can't be empty";
+          }
+          if(value.length < 6) {
+            return "Password should be a min of 6 characters";
+          }
+          return null;
+        }, //defined in auth_service
         style: TextStyle(fontSize: 20.0),
         decoration: buildSignUpInputDecoration("Password"),
         obscureText: true,
         onSaved: (value) => _password = value,
       )
     );
-    textFields.add(SizedBox(height: 20));
+    textFields.add(SizedBox(height: 10));
 
+    //appears only in signup state
+    if (authFormType == AuthFormType.signUp) {
+      textFields.add(
+        TextFormField(
+          validator: (value) {
+            if(value.isEmpty) {
+              return "Password cannot be empty";
+            }
+            if(value != _verifypassword){
+              return "Passwords don't match";
+            }
+            return null;
+          },
+          style: TextStyle(fontSize: 20.0),
+          decoration: buildSignUpInputDecoration("Re-enter password"),
+          obscureText: true,
+          onSaved: (value) => _verifypassword = value,
+        )
+      );
+    }
+    textFields.add(SizedBox(height: 15));
     return textFields;
   }
 
@@ -201,6 +279,5 @@ class _SignUpViewState extends State<SignUpView> {
         }, 
       )
     ];
-  
   }
 }

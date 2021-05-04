@@ -32,3 +32,37 @@ class AuthService {
     return _firebaseAuth.signOut();
   }
 }
+
+//form validators for sign_up_view
+class NameValidator {
+  static String validate(String value) {
+    if(value.isEmpty) {
+      return "Name can't be empty";
+    }
+    if(value.length < 2) {
+      return "Name must be atleast 2 characters long";
+    }
+    if(value.length > 50) {
+      return "Name must be less than 50 characters";
+    }
+    return null;
+  }
+}
+
+class EmailValidator {
+  static String validate(String value) {
+    if(value.isEmpty) {
+      return "Email can't be empty";
+    }
+    return null;
+  }
+}
+
+// class PasswordValidator {
+//   static String validate(String value) {
+//     if(value.isEmpty) {
+//       return "Password can't be empty";
+//     }
+//     return null;
+//   }
+// }
