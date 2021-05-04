@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:travel_treasury/models/trip.dart';
+import 'package:travel_treasury/services/auth_service.dart';
 import 'package:travel_treasury/views/home_view.dart';
 import 'package:travel_treasury/views/new_trips/location_view.dart';
 import 'pages.dart';
+import 'package:travel_treasury/widgets/provider_widget.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -40,6 +43,18 @@ class _HomeState extends State<Home> {
                   builder: (context) => NewTripLocationView(trip: newTrip)
                 )
               );
+            }
+          ),
+          IconButton(
+            icon: Icon(Icons.undo), 
+            onPressed: () async {
+              try {
+                AuthService auth = Provider.of(context).auth;
+                await auth.signOut();
+                print("Signed Out!");
+              } catch (e) {
+                print(e);
+              }
             }
           ),
         ],
