@@ -4,7 +4,7 @@ class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   //signifies if the user change their login state(sign in or sign out)
-  Stream<String> get autheStateChanges => _firebaseAuth.authStateChanges().map(
+  Stream<String> get onAuthStateChanged => _firebaseAuth.authStateChanges().map(
     (User user) => user?.uid,
   );
 

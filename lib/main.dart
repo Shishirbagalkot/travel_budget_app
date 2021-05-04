@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:travel_treasury/home_widget.dart';
+import 'package:travel_treasury/services/auth_service.dart';
 import 'package:travel_treasury/views/first_view.dart';
+import 'package:travel_treasury/views/sign_up_view.dart';
 
 
 
@@ -15,17 +17,55 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Travel Budget App",
-      theme: ThemeData(
-        primarySwatch: Colors.green,
+    return Provider(
+      auth: AuthService(),
+        child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Travel Budget App",
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+        ),
+        home: HomeController(),
+        routes: <String, WidgetBuilder>{
+          '/signUp' : (BuildContext context) => SignUpView(),
+          '/home' : (BuildContext context) => HomeController(),
+        },
       ),
-      home: FirstView(),
-      routes: <String, WidgetBuilder>{
-        '/signUp' : (BuildContext context) => Home(),
-        '/home' : (BuildContext context) => Home(),
-      },
     );
   }
+}
+
+
+//will control whether home / sign in page is to be displayed
+class HomeController extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    /*used to listen to stream of state change and show first view or home view accordingly*/
+    final AuthService auth = Provider.of(context).auth;
+    return StreamBuilder(
+      stream: auth.onAuthStateChanged,
+      builder: (context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          final bool signedIn = snapshot.hasData;
+          return signedIn ? Home() : FirstView(); 
+        }
+        return CircularProgressIndicator();
+      }
+    );
+  }
+}
+
+
+//will alert all it's child widgets that the auth state has been changed
+class Provider extends InheritedWidget{
+  final AuthService auth;
+  Provider({Key key, Widget child, this.auth}) : super(key: key, child: child);
+
+  @override
+  bool updateShouldNotify(InheritedWidget oldWidget){
+    return true;
+  }
+
+  //provider will let us know when something in the inherited widget changes
+  static Provider of(BuildContext context) => (context.dependOnInheritedWidgetOfExactType<Provider>());
 }
