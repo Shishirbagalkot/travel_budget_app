@@ -33,6 +33,7 @@ dependencies:
   firebase_core: ^1.1.0
   date_range_picker: ^1.0.3
   auto_size_text: ^2.0.2
+  firebase_auth: ^1.1.2
   
 dev_dependencies:
   flutter_test:
