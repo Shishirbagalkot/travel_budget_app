@@ -72,7 +72,7 @@ class FirstView extends StatelessWidget {
                 TextButton(
                   //redirect to sign in page
                   onPressed: () {
-
+                    Navigator.of(context).pushReplacementNamed('/signIn');
                   }, 
                   child: Text("Sign In", style: TextStyle(color: Colors.white, fontSize: 25.0,))
                 ),
