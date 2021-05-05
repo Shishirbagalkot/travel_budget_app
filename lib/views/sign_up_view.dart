@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:travel_treasury/services/auth_service.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:travel_treasury/widgets/provider_widget.dart';
-
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 
 final primaryColor = const Color(0xFF75A2EA);
 
 //to determine if signed in or not
-enum AuthFormType{signIn, signUp, reset}
+enum AuthFormType{signIn, signUp, reset, anonymous}
 
 class SignUpView extends StatefulWidget {
 
@@ -86,40 +87,64 @@ class _SignUpViewState extends State<SignUpView> {
     }
   }
 
+  //for anonymouse sign in
+  Future submitAnonymous() async{
+    final auth = Provider.of(context).auth;
+    await auth.signInAnonymously();
+    //once user is created, naigate to homepage
+    Navigator.of(context).pushReplacementNamed("/home");
+  }
+
   @override
   Widget build(BuildContext context) {
 
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        color: primaryColor,
-        height: _height,
-        width: _width,
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: _height * 0.025),
-              showAlert(),
-              SizedBox(height: _height * 0.025),
-              buildHeaderText(),
-              SizedBox(height: _height * 0.05),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    children: buildInputs() + buildButtons(),
-                  )
-                ),
-              ),
-            ],
-          )
+    if (authFormType == AuthFormType.anonymous) {
+      submitAnonymous();
+      return Scaffold(
+        backgroundColor: primaryColor,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SpinKitFadingCircle(
+              color: Colors.white,
+            ),
+            Text("Loading", style: TextStyle(color: Colors.white),),
+          ],
         ),
-      ),
-    );
+      );
+    } else {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Container(
+          color: primaryColor,
+          height: _height,
+          width: _width,
+          child: SafeArea(
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: _height * 0.025),
+                showAlert(),
+                SizedBox(height: _height * 0.025),
+                buildHeaderText(),
+                SizedBox(height: _height * 0.05),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: buildInputs() + buildButtons(),
+                    )
+                  ),
+                ),
+              ],
+            )
+          ),
+        ),
+      );
+    }
   }
 
   ///////////to display error sent by firebase ///////////
@@ -275,6 +300,8 @@ class _SignUpViewState extends State<SignUpView> {
   List<Widget> buildButtons () {
     String _switchButtonText, _newFormState, _submitButtonText;
     bool _showForgotPassword = false;
+    bool _showSocial = true;
+
     if (authFormType == AuthFormType.signIn) {
       _switchButtonText = "Create new account";
       _newFormState = "signUp";
@@ -284,6 +311,7 @@ class _SignUpViewState extends State<SignUpView> {
       _switchButtonText = "Return to Sign In";
       _newFormState = "signIn";
       _submitButtonText = "Submit";
+      _showSocial = false;
     } else {
       _switchButtonText = "Have an account? Sign In";
       _newFormState = "signIn";
@@ -309,8 +337,9 @@ class _SignUpViewState extends State<SignUpView> {
         child: Text(_switchButtonText, style: TextStyle(color: Colors.white),),
         onPressed: () {
           switchFormState(_newFormState);
-        }, 
-      )
+        },
+      ),
+      buildSocialIcons(_showSocial),
     ];
   }
 
@@ -329,4 +358,32 @@ class _SignUpViewState extends State<SignUpView> {
       visible: visible,
     );
   }
+
+  //social account signin
+  Widget buildSocialIcons(bool visible) {
+
+    final _auth = Provider.of(context).auth;
+
+    return Visibility(
+      child: Column(
+        children: <Widget>[
+          Divider(color: Colors.white),
+          SizedBox(height: 10.0),
+          GoogleSignInButton(
+            onPressed: () async{
+              try {
+                await _auth.signInWithGoogle();
+                Navigator.of(context).pushReplacementNamed('/home');
+              } catch (e) {
+                setState(() {
+                  _warning = e.message;
+                });
+              }
+            }
+          ),
+        ],
+      ),
+      visible: visible,
+    );
+  } 
 }

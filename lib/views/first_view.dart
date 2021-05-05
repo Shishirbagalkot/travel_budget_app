@@ -31,7 +31,7 @@ class FirstView extends StatelessWidget {
                 Text(
                   'Welcome', 
                   style: TextStyle(
-                    fontSize: 44.0, 
+                    fontSize: 45.0, 
                     color: Colors.white)
                 ),
                 SizedBox(height: _height * .10),
@@ -41,7 +41,7 @@ class FirstView extends StatelessWidget {
                   maxLines: 2,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 40.0, 
+                    fontSize: 35.0, 
                     color: Colors.white)
                 ),
                 SizedBox(height: _height * .15),
@@ -59,7 +59,7 @@ class FirstView extends StatelessWidget {
                         primaryButtonText: "Create My Account", 
                         primaryButtonRoute: "/signUp",
                         secondaryButtonText: "Maybe Later", 
-                        secondaryButtonRoute: "/home",
+                        secondaryButtonRoute: "/anonymousSignIn",
                       )
                     );
                   }, 
