@@ -4,11 +4,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:travel_treasury/widgets/provider_widget.dart';
 
 
-// TODO move this to tone location
 final primaryColor = const Color(0xFF75A2EA);
 
 //to determine if signed in or not
-enum AuthFormType{signIn, signUp}
+enum AuthFormType{signIn, signUp, reset}
 
 class SignUpView extends StatefulWidget {
 
@@ -26,7 +25,7 @@ class _SignUpViewState extends State<SignUpView> {
   _SignUpViewState({this.authFormType});
 
   final formKey = GlobalKey<FormState>();
-  String _email, _password, _name, _verifypassword, _error;
+  String _email, _password, _name, _verifypassword, _warning;
 
   //to return to sign in page from sign up page
   void switchFormState(String state) {
@@ -64,7 +63,16 @@ class _SignUpViewState extends State<SignUpView> {
           String uid = await auth.signInWithEmailAndPassword(_email, _password);
           print("Signed in with $uid");
           Navigator.of(context).pushReplacementNamed("/home");
-        } else {
+        }
+        //to send password reset link to mail 
+        else if(authFormType == AuthFormType.reset) {
+          await auth.sendPasswordResetEmail(_email);
+          _warning = "Password reset link has been sent to $_email";
+          setState(() {
+            authFormType = AuthFormType.signIn;
+          });
+        } 
+        else {
           String uid = await auth.createUserWithEmailAndPassword(_email, _password, _name);
           print("Signed up with new ID $uid");
           Navigator.of(context).pushReplacementNamed("/home");
@@ -72,7 +80,7 @@ class _SignUpViewState extends State<SignUpView> {
       } catch (e) {
           print(e);
           setState(() {
-            _error = e.message; //the error message sent from firebase
+            _warning = e.message; //the error message sent from firebase
           });
       }
     }
@@ -114,8 +122,10 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
+  ///////////to display error sent by firebase ///////////
+  
   Widget showAlert () {
-    if(_error != null) {
+    if(_warning != null) {
       return Container(
         color: Colors.amberAccent,
         width: double.infinity,
@@ -126,14 +136,14 @@ class _SignUpViewState extends State<SignUpView> {
               padding: const EdgeInsets.only(right: 8.0),
               child: Icon(Icons.error_outline),
             ),
-            Expanded(child: AutoSizeText(_error, maxLines: 3)),
+            Expanded(child: AutoSizeText(_warning, maxLines: 3)),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: IconButton(
                 icon: Icon(Icons.close), 
                 onPressed: () {
                   setState(() {
-                    _error = null;
+                    _warning = null;
                   });
                 }
               ),
@@ -145,10 +155,14 @@ class _SignUpViewState extends State<SignUpView> {
     return SizedBox(height: 0);
   }
 
+  /////////// for displaying header text in each page ///////////
+  
   AutoSizeText buildHeaderText() {
     String _headerText;
     if (authFormType == AuthFormType.signUp) {
       _headerText = "Create New Account";
+    } else if(authFormType == AuthFormType.reset) {
+      _headerText = "Reset Password";
     } else {
       _headerText = "Sign In";
     }
@@ -163,9 +177,23 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
+  //////////form widgets///////////
+
   List<Widget> buildInputs() {
     List<Widget> textFields = [];
-
+    //for resetting password
+    if(authFormType == AuthFormType.reset) {
+      textFields.add(
+        TextFormField(
+          validator: EmailValidator.validate, //defined in auth_service
+          style: TextStyle(fontSize: 20.0),
+          decoration: buildSignUpInputDecoration("Email"),
+          onSaved: (value) => _email = value,
+        )
+      );
+      textFields.add(SizedBox(height: 10));
+      return textFields; //want to return only this form field instead of all 
+    }
     //if in signup state add name
     if (authFormType == AuthFormType.signUp) {
       textFields.add(
@@ -178,7 +206,6 @@ class _SignUpViewState extends State<SignUpView> {
       );
       textFields.add(SizedBox(height: 10));
     }
-
     //add email and password
     textFields.add(
       TextFormField(
@@ -208,7 +235,6 @@ class _SignUpViewState extends State<SignUpView> {
       )
     );
     textFields.add(SizedBox(height: 10));
-
     //appears only in signup state
     if (authFormType == AuthFormType.signUp) {
       textFields.add(
@@ -244,19 +270,25 @@ class _SignUpViewState extends State<SignUpView> {
       );
   }
 
+  ///////////button widgets///////////
+
   List<Widget> buildButtons () {
     String _switchButtonText, _newFormState, _submitButtonText;
-
+    bool _showForgotPassword = false;
     if (authFormType == AuthFormType.signIn) {
       _switchButtonText = "Create new account";
       _newFormState = "signUp";
       _submitButtonText = "Sign In";
+      _showForgotPassword = true;
+    } else if(authFormType == AuthFormType.reset){
+      _switchButtonText = "Return to Sign In";
+      _newFormState = "signIn";
+      _submitButtonText = "Submit";
     } else {
       _switchButtonText = "Have an account? Sign In";
       _newFormState = "signIn";
       _submitButtonText = "Sign Up";
     }
-
     return [
       Container(
         width: MediaQuery.of(context).size.width * 0.7,
@@ -272,6 +304,7 @@ class _SignUpViewState extends State<SignUpView> {
           onPressed: submit,
         ),
       ),
+      showForgotPassword(_showForgotPassword),
       TextButton(
         child: Text(_switchButtonText, style: TextStyle(color: Colors.white),),
         onPressed: () {
@@ -279,5 +312,21 @@ class _SignUpViewState extends State<SignUpView> {
         }, 
       )
     ];
+  }
+
+
+  //for resetting password
+  Widget showForgotPassword(bool visible) {
+    return Visibility(
+      child: TextButton(
+        onPressed: () {
+          setState(() {
+            authFormType = AuthFormType.reset;
+          });
+        }, 
+        child: Text("Forgot Password?", style: TextStyle(color: Colors.white),)
+      ),
+      visible: visible,
+    );
   }
 }

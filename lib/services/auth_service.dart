@@ -31,6 +31,11 @@ class AuthService {
   signOut() {
     return _firebaseAuth.signOut();
   }
+
+  //reset password
+  Future sendPasswordResetEmail(String email) async{
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 }
 
 //form validators for sign_up_view
@@ -57,12 +62,3 @@ class EmailValidator {
     return null;
   }
 }
-
-// class PasswordValidator {
-//   static String validate(String value) {
-//     if(value.isEmpty) {
-//       return "Password can't be empty";
-//     }
-//     return null;
-//   }
-// }
