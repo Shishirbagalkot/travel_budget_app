@@ -8,7 +8,7 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 final primaryColor = const Color(0xFF75A2EA);
 
 //to determine if signed in or not
-enum AuthFormType{signIn, signUp, reset, anonymous}
+enum AuthFormType{signIn, signUp, reset, anonymous, convert}
 
 class SignUpView extends StatefulWidget {
 
@@ -35,6 +35,8 @@ class _SignUpViewState extends State<SignUpView> {
       setState(() {
         authFormType = AuthFormType.signUp;
       });
+    } else if(state == "home") {
+      Navigator.of(context).pop();
     } else {
       setState(() {
         authFormType = AuthFormType.signIn;
@@ -57,26 +59,36 @@ class _SignUpViewState extends State<SignUpView> {
   //function for build buttons
   //to main state change consistently throughout the app
   void submit() async{
+    
     if(validate()) {  
       try {
         final auth = Provider.of(context).auth;
-        if(authFormType == AuthFormType.signIn) {
-          String uid = await auth.signInWithEmailAndPassword(_email, _password);
-          print("Signed in with $uid");
-          Navigator.of(context).pushReplacementNamed("/home");
-        }
-        //to send password reset link to mail 
-        else if(authFormType == AuthFormType.reset) {
-          await auth.sendPasswordResetEmail(_email);
-          _warning = "Password reset link has been sent to $_email";
-          setState(() {
-            authFormType = AuthFormType.signIn;
-          });
-        } 
-        else {
-          String uid = await auth.createUserWithEmailAndPassword(_email, _password, _name);
-          print("Signed up with new ID $uid");
-          Navigator.of(context).pushReplacementNamed("/home");
+
+        switch (authFormType) {
+          case AuthFormType.signIn:
+            await auth.signInWithEmailAndPassword(_email, _password);
+            Navigator.of(context).pushReplacementNamed("/home");
+            break;
+          //to send password reset link to mail
+          case AuthFormType.reset:
+            await auth.sendPasswordResetEmail(_email);
+            _warning = "Password reset link has been sent to $_email";
+            setState(() {
+              authFormType = AuthFormType.signIn;
+            });
+            break;
+          case AuthFormType.signUp:
+            await auth.createUserWithEmailAndPassword(_email, _password, _name);
+            Navigator.of(context).pushReplacementNamed("/home");
+            break;
+          case AuthFormType.anonymous:
+            await auth.signInAnonymously();
+            //once user is created, naigate to homepage
+            Navigator.of(context).pushReplacementNamed("/home");
+            break;
+          case AuthFormType.convert:
+            break;
+          default:
         }
       } catch (e) {
           print(e);
@@ -87,14 +99,6 @@ class _SignUpViewState extends State<SignUpView> {
     }
   }
 
-  //for anonymouse sign in
-  Future submitAnonymous() async{
-    final auth = Provider.of(context).auth;
-    await auth.signInAnonymously();
-    //once user is created, naigate to homepage
-    Navigator.of(context).pushReplacementNamed("/home");
-  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -102,7 +106,7 @@ class _SignUpViewState extends State<SignUpView> {
     final _height = MediaQuery.of(context).size.height;
 
     if (authFormType == AuthFormType.anonymous) {
-      submitAnonymous();
+      submit();
       return Scaffold(
         backgroundColor: primaryColor,
         body: Column(
@@ -184,12 +188,12 @@ class _SignUpViewState extends State<SignUpView> {
   
   AutoSizeText buildHeaderText() {
     String _headerText;
-    if (authFormType == AuthFormType.signUp) {
-      _headerText = "Create New Account";
+    if (authFormType == AuthFormType.signIn) {
+      _headerText = "Sign In";
     } else if(authFormType == AuthFormType.reset) {
       _headerText = "Reset Password";
     } else {
-      _headerText = "Sign In";
+      _headerText = "Create New Account";
     }
     return AutoSizeText(
       _headerText,
@@ -220,7 +224,7 @@ class _SignUpViewState extends State<SignUpView> {
       return textFields; //want to return only this form field instead of all 
     }
     //if in signup state add name
-    if (authFormType == AuthFormType.signUp) {
+    if ([AuthFormType.signUp , AuthFormType.convert].contains(authFormType)) {
       textFields.add(
         TextFormField(
           validator: NameValidator.validate, //defined in auth_service
@@ -312,6 +316,10 @@ class _SignUpViewState extends State<SignUpView> {
       _newFormState = "signIn";
       _submitButtonText = "Submit";
       _showSocial = false;
+    } else if(authFormType == AuthFormType.convert) {
+      _switchButtonText = "Cancel";
+      _newFormState = "home";
+      _submitButtonText = "Sign Up";
     } else {
       _switchButtonText = "Have an account? Sign In";
       _newFormState = "signIn";

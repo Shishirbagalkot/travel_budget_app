@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:travel_treasury/home_widget.dart';
+import 'package:travel_treasury/views/navigation_view.dart';
 import 'package:travel_treasury/services/auth_service.dart';
 import 'package:travel_treasury/views/first_view.dart';
 import 'package:travel_treasury/views/sign_up_view.dart';
@@ -28,10 +28,11 @@ class MyApp extends StatelessWidget {
         ),
         home: HomeController(),
         routes: <String, WidgetBuilder>{
+          '/home' : (BuildContext context) => HomeController(),
           '/signUp' : (BuildContext context) => SignUpView(authFormType: AuthFormType.signUp),
           '/signIn' : (BuildContext context) => SignUpView(authFormType: AuthFormType.signIn),
           '/anonymousSignIn' : (BuildContext context) => SignUpView(authFormType: AuthFormType.anonymous),
-          '/home' : (BuildContext context) => HomeController(),
+          '/convertUser': (BuildContext context) => SignUpView(authFormType: AuthFormType.convert),
         },
       ),
     );

@@ -3,7 +3,7 @@ import 'package:travel_treasury/models/trip.dart';
 import 'package:travel_treasury/services/auth_service.dart';
 import 'package:travel_treasury/views/home_view.dart';
 import 'package:travel_treasury/views/new_trips/location_view.dart';
-import 'pages.dart';
+import '../pages.dart';
 import 'package:travel_treasury/widgets/provider_widget.dart';
 
 
@@ -55,6 +55,12 @@ class _HomeState extends State<Home> {
               } catch (e) {
                 print(e);
               }
+            }
+          ),
+          IconButton(
+            icon: Icon(Icons.account_circle), 
+            onPressed: () {
+              Navigator.of(context).pushNamed('/convertUser');      
             }
           ),
         ],
