@@ -46,6 +46,9 @@ class _SignUpViewState extends State<SignUpView> {
 
   //if form is validated, the form is submitted
   bool validate() {
+    if(authFormType == AuthFormType.anonymous) {
+      return true;
+    }
     //if form is not saved then the db cannot be updated
     final form = formKey.currentState;
     if(form.validate()) {
@@ -87,6 +90,8 @@ class _SignUpViewState extends State<SignUpView> {
             Navigator.of(context).pushReplacementNamed("/home");
             break;
           case AuthFormType.convert:
+            await auth.convertUserWithEmail(_email, _password, _name);
+            Navigator.of(context).pop();
             break;
           default:
         }
@@ -380,9 +385,14 @@ class _SignUpViewState extends State<SignUpView> {
           GoogleSignInButton(
             onPressed: () async{
               try {
+                if(authFormType == AuthFormType.convert) {
+                  await _auth.convertWithGoogle();
+                  Navigator.of(context).pop();
+                } else {
                 await _auth.signInWithGoogle();
                 Navigator.of(context).pushReplacementNamed('/home');
-              } catch (e) {
+                } 
+              }catch (e) {
                 setState(() {
                   _warning = e.message;
                 });

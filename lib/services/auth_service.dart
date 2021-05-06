@@ -18,9 +18,14 @@ class AuthService {
     );
 
     //update username
-    await _firebaseAuth.currentUser.updateProfile(displayName: name);
+    await updateUserName(name);
     return currentUser.user.uid;
   }
+
+  Future updateUserName(String name) async {
+    await _firebaseAuth.currentUser.updateProfile(displayName: name);
+  }
+
   //email and password sign-in
   Future<String> signInWithEmailAndPassword(String email, String password) async{
     return (await _firebaseAuth.signInWithEmailAndPassword(
@@ -44,6 +49,27 @@ class AuthService {
     return _firebaseAuth.signInAnonymously();
   }
 
+  //for creating accounts for anonymous users
+  Future convertUserWithEmail(String email, String password, String name) async{
+    final currentUser = _firebaseAuth.currentUser;
+    final credential = EmailAuthProvider.credential(email: email, password: password);
+    await currentUser.linkWithCredential(credential);
+    await updateUserName(name);
+  }
+
+  //anonymous user => google sign in
+  Future convertWithGoogle() async{
+    final currentUser = _firebaseAuth.currentUser;
+    final GoogleSignInAccount account = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication _googleAuth = await account.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      idToken: _googleAuth.idToken,
+      accessToken: _googleAuth.accessToken,
+    );
+    await currentUser.linkWithCredential(credential);
+    await updateUserName(_googleSignIn.currentUser.displayName);
+  }
+
   //Google signin
   Future<String> signInWithGoogle() async{
     final GoogleSignInAccount account = await _googleSignIn.signIn();
@@ -53,7 +79,6 @@ class AuthService {
       accessToken: _googleAuth.accessToken,
     );
     return (await _firebaseAuth.signInWithCredential(credential)).user.uid;
-    
   }
 }
 
