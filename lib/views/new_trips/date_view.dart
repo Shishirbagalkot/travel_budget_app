@@ -49,6 +49,9 @@ class _NewTripDateViewState extends State<NewTripDateView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            buildSelectedDetails(context, widget.trip),
+
+            Spacer(),
             Text("Location ${widget.trip.title}"),
 
             //date picker
@@ -79,7 +82,74 @@ class _NewTripDateViewState extends State<NewTripDateView> {
               }, 
               child: Text("Continue"),
             ),
+            Spacer(),
           ],
+        ),
+      ),
+    );
+  }
+
+  //this widget is displayed at the top of date view page
+  Widget buildSelectedDetails(BuildContext context, Trip trip) {
+    return Hero(
+      tag: "SelectedTrip-${trip.title}",
+      transitionOnUserGestures: true,
+        child: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 8.0,
+            right: 8.0
+          ),
+          child: SingleChildScrollView(
+              child: Card(
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0 ,left: 16.0),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                            Text(trip.title, style: TextStyle(fontSize: 20.0)),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Average Budget -- Not setup yet"),
+                            ]
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Trip Dates"),
+                            ]
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Trip Budget"),
+                            ]
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Trip Type"),
+                            ]
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Placeholder(
+                        fallbackHeight: 100,
+                        fallbackWidth: 100,
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
