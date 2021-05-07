@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travel_treasury/models/trip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:travel_treasury/widgets/provider_widget.dart';
 
 class NewTripBudgetView extends StatelessWidget {
 
@@ -28,8 +29,9 @@ class NewTripBudgetView extends StatelessWidget {
               child: Text("Finish"),
               onPressed: () async{ 
                 //save data to firebase, async to prevent lock-up of frontend
+                final uid = await Provider.of(context).auth.getCurrentUID();
                 //trip.toJson is added from Map from trip.dart
-                await db.collection("trips").add(trip.toJson());
+                await db.collection("userData").doc(uid).collection("trips").add(trip.toJson());
 
                 //removes all pages from stack and goes to first page
                 Navigator.of(context).popUntil((route) => route.isFirst);
