@@ -41,6 +41,7 @@ class _NewTripDateViewState extends State<NewTripDateView> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Create Trip-Date'
         ),

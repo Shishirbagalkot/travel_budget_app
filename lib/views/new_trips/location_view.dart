@@ -3,6 +3,7 @@ import 'package:travel_treasury/models/trip.dart';
 import 'package:travel_treasury/models/places.dart';
 import 'package:travel_treasury/views/new_trips/date_view.dart';
 import 'package:travel_treasury/widgets/divider_with_text_widget.dart';
+import 'package:travel_treasury/credentials.dart';
 
 class NewTripLocationView extends StatelessWidget {
 
