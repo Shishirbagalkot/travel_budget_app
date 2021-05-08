@@ -4,11 +4,19 @@ import 'package:travel_treasury/models/places.dart';
 import 'package:travel_treasury/views/new_trips/date_view.dart';
 import 'package:travel_treasury/widgets/divider_with_text_widget.dart';
 import 'package:travel_treasury/credentials.dart';
+import 'package:dio/dio.dart';
 
-class NewTripLocationView extends StatelessWidget {
+class NewTripLocationView extends StatefulWidget {
 
   final Trip trip;
   NewTripLocationView({Key key, @required this.trip}) : super(key: key);
+
+  @override
+  _NewTripLocationViewState createState() => _NewTripLocationViewState();
+}
+
+class _NewTripLocationViewState extends State<NewTripLocationView> {
+  String _heading;
 
   final List<Place> _placesList = [
     Place("Bangalore", 5000.00),
@@ -19,12 +27,39 @@ class NewTripLocationView extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _heading = "Suggestions";
+  }
+
+  void getLocationResults(String input) async{
+    if(input.isEmpty) {
+      setState(() {
+        _heading = "Suggestions";
+      });
+      return;
+    } 
+    
+    //requires billing hence try to use plugin
+    //google places api call
+    String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+    String type = '(regions)';
+    String request = '$baseURL?input=$input&key=$PLACES_API_KEY&type=$type';
+    Response response = await Dio().get(request);
+
+    print(response);
+
+    setState(() {
+      _heading = "Results";
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     //for the text field
-    TextEditingController _titleController = new TextEditingController();
-
-    _titleController.text = trip.title;
+    // TextEditingController _titleController = new TextEditingController();
+    // _titleController.text = widget.trip.title;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,13 +72,24 @@ class NewTripLocationView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(30.0),
               child: TextField(
-                controller: _titleController,
+                //controller: _titleController,
                 decoration: InputDecoration(prefixIcon: Icon(Icons.search), hintText: "Search"),
+                //take the text entered into this field ans display results from places api
+                onChanged: (text) {
+                  getLocationResults(text);
+                },
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: DividerWithText(dividerText:"Suggestions"),
+              child: Row(
+                //dividerithtext widget not working hence using this
+                children: [
+                  Expanded(child: Divider()),
+                  Text(_heading),
+                  Expanded(child: Divider()),
+                ],
+              ),
             ),
             Expanded(
               child: ListView.builder(
@@ -103,11 +149,11 @@ class NewTripLocationView extends StatelessWidget {
                 ),
                 onTap: () {
                   //the place of the card selected is saved to trip.title
-                  trip.title = _placesList[index].name;
+                  widget.trip.title = _placesList[index].name;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => NewTripDateView(trip: trip)),
+                      builder: (context) => NewTripDateView(trip: widget.trip)),
                   );
                 },
               ),
