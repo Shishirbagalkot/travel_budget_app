@@ -3,16 +3,17 @@ import 'package:travel_treasury/models/trip.dart';
 import 'package:travel_treasury/services/auth_service.dart';
 import 'package:travel_treasury/views/home_view.dart';
 import 'package:travel_treasury/views/new_trips/location_view.dart';
+import 'package:travel_treasury/views/sign_up_view.dart';
 import '../pages.dart';
 import 'package:travel_treasury/widgets/provider_widget.dart';
-
 
 class Home extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _HomeState();
-      }
-    }
+  }
+
+}
     
 class _HomeState extends State<Home> {
   
@@ -57,6 +58,7 @@ class _HomeState extends State<Home> {
               }
             }
           ),
+          //iconbutton should be displayed depending if anonymous user
           IconButton(
             icon: Icon(Icons.account_circle), 
             onPressed: () {
@@ -97,4 +99,5 @@ class _HomeState extends State<Home> {
     });
   }
 }
+
 

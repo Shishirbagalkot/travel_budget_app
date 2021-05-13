@@ -18,6 +18,7 @@ class SignUpView extends StatefulWidget {
 
   @override
   _SignUpViewState createState() => _SignUpViewState(authFormType: this.authFormType);
+
 }
 
 class _SignUpViewState extends State<SignUpView> {
@@ -155,6 +156,7 @@ class _SignUpViewState extends State<SignUpView> {
       );
     }
   }
+   
 
   ///////////to display error sent by firebase ///////////
   
